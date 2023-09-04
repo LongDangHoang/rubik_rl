@@ -321,35 +321,37 @@ class Rubik54:
     MID_LEFT = {"LEFT": LEFT_OFFSET + 4}
     CENTER = {}
 
-    POSITION_IJK_TO_CUBE = {
+    # i point to right, j point to top, k point to front
+    # and 0, 0, 0 is back-down-left corner
+    POSITION_IJK_TO_CUBELET = {
         (0, 0, 0): BACK_DOWN_LEFT_CORNER,
-        (0, 0, 1): BACK_DOWN_EDGE,
-        (0, 0, 2): BACK_DOWN_RIGHT_CORNER,
+        (0, 0, 1): LEFT_DOWN_EDGE,
+        (0, 0, 2): FRONT_DOWN_LEFT_CORNER,
         (0, 1, 0): BACK_LEFT_EDGE,
-        (0, 1, 1): MID_BACK,
-        (0, 1, 2): BACK_RIGHT_EDGE,
+        (0, 1, 1): MID_LEFT,
+        (0, 1, 2): FRONT_LEFT_EDGE,
         (0, 2, 0): BACK_TOP_LEFT_CORNER,
-        (0, 2, 1): BACK_TOP_EDGE,
-        (0, 2, 2): BACK_TOP_RIGHT_CORNER,
-        (1, 0, 0): LEFT_DOWN_EDGE,
+        (0, 2, 1): LEFT_TOP_EDGE,
+        (0, 2, 2): FRONT_TOP_LEFT_CORNER,
+        (1, 0, 0): BACK_DOWN_EDGE,
         (1, 0, 1): MID_DOWN,
-        (1, 0, 2): RIGHT_DOWN_EDGE,
-        (1, 1, 0): MID_LEFT,
+        (1, 0, 2): FRONT_DOWN_EDGE,
+        (1, 1, 0): MID_BACK,
         (1, 1, 1): CENTER,
-        (1, 1, 2): MID_RIGHT,
-        (1, 2, 0): LEFT_TOP_EDGE,
+        (1, 1, 2): MID_FRONT,
+        (1, 2, 0): BACK_TOP_EDGE,
         (1, 2, 1): MID_TOP,
-        (1, 2, 2): RIGHT_TOP_EDGE,
-        (2, 0, 0): FRONT_DOWN_LEFT_CORNER,
-        (2, 0, 1): FRONT_DOWN_EDGE,
+        (1, 2, 2): FRONT_TOP_EDGE,
+        (2, 0, 0): BACK_DOWN_RIGHT_CORNER,
+        (2, 0, 1): RIGHT_DOWN_EDGE,
         (2, 0, 2): FRONT_DOWN_RIGHT_CORNER,
-        (2, 1, 0): FRONT_LEFT_EDGE,
-        (2, 1, 1): MID_FRONT,
+        (2, 1, 0): BACK_RIGHT_EDGE,
+        (2, 1, 1): MID_RIGHT,
         (2, 1, 2): FRONT_RIGHT_EDGE,
-        (2, 2, 0): FRONT_TOP_LEFT_CORNER,
-        (2, 2, 1): FRONT_TOP_EDGE,
+        (2, 2, 0): BACK_TOP_RIGHT_CORNER,
+        (2, 2, 1): RIGHT_TOP_EDGE,
         (2, 2, 2): FRONT_TOP_RIGHT_CORNER,
-    } # i point to front, j point to top, k point to right
+    }
 
 
     def __init__(self):
