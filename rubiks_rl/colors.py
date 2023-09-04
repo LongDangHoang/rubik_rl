@@ -1,6 +1,5 @@
 import numpy as np
 
-
 class Color:
     RED = 1
     BLUE = 2

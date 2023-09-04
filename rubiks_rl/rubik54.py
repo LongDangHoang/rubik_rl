@@ -1,8 +1,8 @@
 import numpy as np
 
-from typing import Dict
-
 from colors import Color
+
+from typing import Dict
 
 class Rubik54:
     """
@@ -318,7 +318,7 @@ class Rubik54:
         TOP_OFFSET + 3,
         None,
         None,
-        LEfT_OFFSET + 7,
+        LEFT_OFFSET + 7,
     ]
 
     LEFT_DOWN_EDGE = [
@@ -461,4 +461,4 @@ class Rubik54:
         return np.all(state == self.SOLVED_STATE)
 
     def visualise_state(self, state: np.ndarray):
-        # 
+        pass
