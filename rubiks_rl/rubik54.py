@@ -1,6 +1,6 @@
 import numpy as np
 
-from colors import Color
+from rubiks_rl.colors import Color
 
 from typing import Dict
 
