@@ -47,7 +47,8 @@ class Rubik54:
     DOWN_OFFSET = 45
 
     # mapping for each turn. This is a very large dictionary that we will convert
-    # to a numpy array
+    # to a numpy array. The dictionary goes from source->target (after move, target 
+    # will use the color of source)
     F = {
         LEFT_OFFSET + 2: TOP_OFFSET,
         LEFT_OFFSET + 5: TOP_OFFSET + 1,
@@ -78,12 +79,12 @@ class Rubik54:
         TOP_OFFSET + 2: BACK_OFFSET + 6,
         TOP_OFFSET + 5: BACK_OFFSET + 3,
         TOP_OFFSET + 8: BACK_OFFSET,
-        BACK_OFFSET + 6: DOWN_OFFSET + 8,
+        BACK_OFFSET + 6: DOWN_OFFSET + 2,
         BACK_OFFSET + 3: DOWN_OFFSET + 5,
-        BACK_OFFSET: DOWN_OFFSET + 2,
-        DOWN_OFFSET + 8: FRONT_OFFSET + 2,
+        BACK_OFFSET: DOWN_OFFSET + 8,
+        DOWN_OFFSET + 2: FRONT_OFFSET + 2,
         DOWN_OFFSET + 5: FRONT_OFFSET + 5,
-        DOWN_OFFSET + 2: FRONT_OFFSET + 8,
+        DOWN_OFFSET + 8: FRONT_OFFSET + 8,
         FRONT_OFFSET + 2: TOP_OFFSET + 2,
         FRONT_OFFSET + 5: TOP_OFFSET + 5,
         FRONT_OFFSET + 8: TOP_OFFSET + 8,
@@ -243,13 +244,13 @@ class Rubik54:
 
     BACK_DOWN_LEFT_CORNER = {
         "BACK": BACK_OFFSET + 2,
-        "DOWN": DOWN_OFFSET + 6,
+        "DOWN": DOWN_OFFSET,
         "LEFT": LEFT_OFFSET,
     }
 
     BACK_DOWN_RIGHT_CORNER = {
         "BACK": BACK_OFFSET,
-        "DOWN": DOWN_OFFSET + 8,
+        "DOWN": DOWN_OFFSET + 2,
         "RIGHT": RIGHT_OFFSET + 2,
     }
 
@@ -382,8 +383,8 @@ class Rubik54:
     def get_turn_state_idx(self, swap_dict: Dict[int, int]):
         """Return an index into the state as a result of a turn from index swap dictionary"""
         idx_arr = np.arange(54)
-        for k, v in swap_dict.items():
-            idx_arr[k], idx_arr[v] = idx_arr[v], idx_arr[k]
+        for sticker_source, sticker_target in swap_dict.items():
+            idx_arr[sticker_target] = sticker_source
         return idx_arr
 
     def change_state_after_turn(self, state: np.ndarray, turn_name: str):
