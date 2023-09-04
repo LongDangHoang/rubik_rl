@@ -1,4 +1,5 @@
 import numpy as np
+import pythreejs as p3
 
 from rubiks_rl.colors import Color
 
@@ -391,5 +392,35 @@ class Rubik54:
     def is_solved_state(self, state: np.ndarray):
         return np.all(state == self.SOLVED_STATE)
 
-    def visualise_state(self, state: np.ndarray):
-        pass
+    def visualise_state(self, state: np.ndarray) -> p3.Scene:
+        # Create cube geometry
+        geometry = p3.BoxGeometry(width=0.9, height=0.9, depth=0.9)
+
+        # get colors for each cubelet
+
+        FACES = ["FRONT", "RIGHT", "BACK", "LEFT", "TOP", "DOWN"]
+        MESH_ORDERING = ["RIGHT", "LEFT", "TOP", "DOWN", "FRONT", "BACK"]
+
+        cube_pieces = []
+        for i in range(3):
+            for j in range(3):
+                for k in range(3):
+                    cubelet_face_state_lookup = self.POSITION_IJK_TO_CUBELET[(i, j, k)]
+                    cubelet_colors = {
+                        f: -1 if f not in cubelet_face_state_lookup else state[cubelet_face_state_lookup[f]].argmax()
+                        for f in FACES
+                    }
+                    cubelet_str_colors = {
+                        k: "purple" if color_idx == -1 else Color.get_str_name(color_idx).lower()
+                        for k, color_idx in cubelet_colors.items()
+                    }
+
+                    materials = [p3.MeshBasicMaterial(color=cubelet_str_colors[face]) for face in MESH_ORDERING]
+
+                    piece = p3.Mesh(geometry=geometry, material=materials)
+                    piece.position = [i, j, k]
+                    cube_pieces.append(piece)
+
+        # Create a scene and add the cube pieces to it
+        scene = p3.Scene(children=cube_pieces)
+        return scene
