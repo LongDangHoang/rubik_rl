@@ -204,195 +204,124 @@ class Rubik54:
     }
 
     # Define cubelets
-    FRONT_TOP_LEFT_CORNER = [
-        None,
-        FRONT_OFFSET + 6,
-        TOP_OFFSET,
-        None,
-        None,
-        LEFT_OFFSET + 8,
-    ]
+    FRONT_TOP_LEFT_CORNER = {
+        "FRONT": FRONT_OFFSET + 6,
+        "TOP": TOP_OFFSET,
+        "LEFT": LEFT_OFFSET + 8,
+    }
 
-    FRONT_TOP_RIGHT_CORNER = [
-        None,
-        FRONT_OFFSET + 8,
-        TOP_OFFSET + 2,
-        None,
-        RIGHT_OFFSET + 6,
-        None,
-    ]
+    FRONT_TOP_RIGHT_CORNER = {
+        "FRONT": FRONT_OFFSET + 8,
+        "TOP": TOP_OFFSET + 2,
+        "RIGHT": RIGHT_OFFSET + 6,
+    }
 
-    FRONT_DOWN_LEFT_CORNER = [
-        None,
-        FRONT_OFFSET,
-        None,
-        DOWN_OFFSET + 6,
-        None,
-        LEFT_OFFSET + 2,
-    ]
+    FRONT_DOWN_LEFT_CORNER = {
+        "FRONT": FRONT_OFFSET,
+        "DOWN": DOWN_OFFSET + 6,
+        "LEFT": LEFT_OFFSET + 2,
+    }
 
-    FRONT_DOWN_RIGHT_CORNER = [
-        None,
-        FRONT_OFFSET + 2,
-        None,
-        DOWN_OFFSET + 8,
-        RIGHT_OFFSET,
-        None,
-    ]
+    FRONT_DOWN_RIGHT_CORNER = {
+        "FRONT": FRONT_OFFSET + 2,
+        "DOWN": DOWN_OFFSET + 8,
+        "RIGHT": RIGHT_OFFSET,
+    }
 
-    BACK_TOP_LEFT_CORNER = [
-        BACK_OFFSET + 8,
-        None,
-        TOP_OFFSET + 6,
-        None,
-        None,
-        LEFT_OFFSET + 6,
-    ]
+    BACK_TOP_LEFT_CORNER = {
+        "BACK": BACK_OFFSET + 8,
+        "TOP": TOP_OFFSET + 6,
+        "LEFT": LEFT_OFFSET + 6,
+    }
 
-    BACK_TOP_RIGHT_CORNER = [
-        BACK_OFFSET + 6,
-        None,
-        TOP_OFFSET + 8,
-        None,
-        RIGHT_OFFSET + 8,
-        None,
-    ]
+    BACK_TOP_RIGHT_CORNER = {
+        "BACK": BACK_OFFSET + 6,
+        "TOP": TOP_OFFSET + 8,
+        "RIGHT": RIGHT_OFFSET + 8,
+    }
 
-    BACK_DOWN_LEFT_CORNER = [
-        BACK_OFFSET + 2,
-        None,
-        None,
-        DOWN_OFFSET + 6,
-        None,
-        LEFT_OFFSET,
-    ]
+    BACK_DOWN_LEFT_CORNER = {
+        "BACK": BACK_OFFSET + 2,
+        "DOWN": DOWN_OFFSET + 6,
+        "LEFT": LEFT_OFFSET,
+    }
 
-    BACK_DOWN_RIGHT_CORNER = [
-        BACK_OFFSET,
-        None,
-        None,
-        DOWN_OFFSET + 8,
-        RIGHT_OFFSET + 2,
-        None,
-    ]
+    BACK_DOWN_RIGHT_CORNER = {
+        "BACK": BACK_OFFSET,
+        "DOWN": DOWN_OFFSET + 8,
+        "RIGHT": RIGHT_OFFSET + 2,
+    }
 
-    FRONT_DOWN_EDGE = [
-        None,
-        FRONT_OFFSET + 1,
-        None,
-        DOWN_OFFSET + 7,
-        None,
-        None,
-    ]
+    FRONT_DOWN_EDGE = {
+        "FRONT": FRONT_OFFSET + 1,
+        "DOWN": DOWN_OFFSET + 7,
+    }
 
-    FRONT_LEFT_EDGE = [
-        None,
-        FRONT_OFFSET + 3,
-        None,
-        None,
-        None,
-        LEFT_OFFSET + 5,
-    ]
+    FRONT_LEFT_EDGE = {
+        "FRONT": FRONT_OFFSET + 3,
+        "LEFT": LEFT_OFFSET + 5,
+    }
 
-    FRONT_RIGHT_EDGE = [
-        None,
-        FRONT_OFFSET + 5,
-        None,
-        None,
-        RIGHT_OFFSET + 3,
-        None,
-    ]
+    FRONT_RIGHT_EDGE = {
+        "FRONT": FRONT_OFFSET + 5,
+        "RIGHT": RIGHT_OFFSET + 3,
+    }
 
-    FRONT_TOP_EDGE = [
-        None,
-        FRONT_OFFSET + 7,
-        TOP_OFFSET + 1,
-        None,
-        None,
-        None,
-    ]
+    FRONT_TOP_EDGE = {
+        "FRONT": FRONT_OFFSET + 7,
+        "TOP": TOP_OFFSET + 1,
+    }
 
-    LEFT_TOP_EDGE = [
-        None,
-        None,
-        TOP_OFFSET + 3,
-        None,
-        None,
-        LEFT_OFFSET + 7,
-    ]
+    LEFT_TOP_EDGE = {
+        "TOP": TOP_OFFSET + 3,
+        "LEFT": LEFT_OFFSET + 7,
+    }
 
-    LEFT_DOWN_EDGE = [
-        None,
-        None,
-        None,
-        DOWN_OFFSET + 3,
-        None,
-        LEFT_OFFSET + 1,
-    ]
+    LEFT_DOWN_EDGE = {
+        "DOWN": DOWN_OFFSET + 3,
+        "LEFT": LEFT_OFFSET + 1,
+    }
 
-    RIGHT_TOP_EDGE = [
-        None,
-        None,
-        TOP_OFFSET + 5,
-        None,
-        RIGHT_OFFSET + 7,
-        None,
-    ]
+    RIGHT_TOP_EDGE = {
+        "TOP": TOP_OFFSET + 5,
+        "RIGHT": RIGHT_OFFSET + 7,
+    }
 
-    RIGHT_DOWN_EDGE = [
-        None,
-        None,
-        None,
-        DOWN_OFFSET + 5,
-        RIGHT_OFFSET + 1,
-        None,
-    ]
+    RIGHT_DOWN_EDGE = {
+        "DOWN": DOWN_OFFSET + 5,
+        "RIGHT": RIGHT_OFFSET + 1,
+    }
 
-    BACK_DOWN_EDGE = [
-        BACK_OFFSET + 1,
-        None,
-        None,
-        DOWN_OFFSET + 1,
-        None,
-        None,
-    ]
+    BACK_DOWN_EDGE = {
+        "BACK": BACK_OFFSET + 1,
+        "DOWN": DOWN_OFFSET + 1,
+    }
 
-    BACK_LEFT_EDGE = [
-        BACK_OFFSET + 5,
-        None,
-        None,
-        None,
-        None,
-        LEFT_OFFSET + 3,
-    ]
+    BACK_LEFT_EDGE = {
+        "BACK": BACK_OFFSET + 5,
+        "LEFT": LEFT_OFFSET + 3,
+    }
 
-    BACK_RIGHT_EDGE = [
-        BACK_OFFSET + 3,
-        None,
-        None,
-        None,
-        RIGHT_OFFSET + 5,
-        None,
-    ]
+    BACK_RIGHT_EDGE = {
+        "BACK": BACK_OFFSET + 3,
+        "RIGHT": RIGHT_OFFSET + 5,
+        "LEFT": None,
+    }
 
-    BACK_TOP_EDGE = [
-        BACK_OFFSET + 7,
-        None,
-        TOP_OFFSET + 7,
-        None,
-        None,
-        None,
-    ]
+    BACK_TOP_EDGE = {
+        "BACK": BACK_OFFSET + 7,
+        "TOP": TOP_OFFSET + 7,
+    }
 
-    MID_FRONT = [None, FRONT_OFFSET + 4, None, None, None, None]
-    MID_RIGHT = [None, None, None, None, RIGHT_OFFSET + 4, None]
-    MID_BACK = [BACK_OFFSET + 4, None, None, None, None, None]
-    MID_LEFT = [None, None, None, None, None, LEFT_OFFSET + 4]
-    MID_TOP = [None, None, TOP_OFFSET + 4, None, None, None]
-    MID_DOWN = [None, None, None, DOWN_OFFSET + 4, None, None]
-    CENTER = [None, None, None, None, None, None]
+    MID_FRONT = {"FRONT": FRONT_OFFSET + 4}
+    MID_RIGHT = {"RIGHT": RIGHT_OFFSET + 4}
+    MID_TOP = {"TOP": TOP_OFFSET + 4}
+    MID_DOWN = {"DOWN": DOWN_OFFSET + 4}
+    MID_BACK = {"BACK": BACK_OFFSET + 4}
+    MID_LEFT = {"LEFT": LEFT_OFFSET + 4}
+    CENTER = {}
 
-    position_ijk_to_cube = {
+    POSITION_IJK_TO_CUBE = {
         (0, 0, 0): BACK_DOWN_LEFT_CORNER,
         (0, 0, 1): BACK_DOWN_EDGE,
         (0, 0, 2): BACK_DOWN_RIGHT_CORNER,

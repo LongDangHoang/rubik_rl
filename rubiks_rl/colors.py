@@ -1,17 +1,17 @@
 import numpy as np
 
 class Color:
-    RED = 1
-    BLUE = 2
-    WHITE = 3
-    ORANGE = 4
-    YELLOW = 5
-    GREEN = 6
+    RED = 0
+    BLUE = 1
+    WHITE = 2
+    ORANGE = 3
+    YELLOW = 4
+    GREEN = 5
 
     @classmethod
     def one_hot(cls, idx: int) -> np.ndarray:
         v = np.zeros(6)
-        v[idx - 1] = 1
+        v[idx] = 1
         return v
 
     @classmethod
