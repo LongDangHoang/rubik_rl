@@ -356,18 +356,18 @@ class Rubik54:
     }
 
     TURN_IDX_TO_STR_SWAP_DICT = {
-        1: ("F", F),
-        2: ("R", R),
-        3: ("B", B),
-        4: ("L", L),
-        5: ("T", T),
-        6: ("D", D),
-        7: ("F_PRIME", F_PRIME),
-        8: ("R_PRIME", R_PRIME),
-        9: ("B_PRIME", B_PRIME),
-        10: ("L_PRIME", L_PRIME),
-        11: ("T_PRIME", T_PRIME),
-        12: ("D_PRIME", D_PRIME),
+        0: ("F", F),
+        1: ("R", R),
+        2: ("B", B),
+        3: ("L", L),
+        4: ("T", T),
+        5: ("D", D),
+        6: ("F_PRIME", F_PRIME),
+        7: ("R_PRIME", R_PRIME),
+        8: ("B_PRIME", B_PRIME),
+        9: ("L_PRIME", L_PRIME),
+        10: ("T_PRIME", T_PRIME),
+        11: ("D_PRIME", D_PRIME),
     }
 
 
