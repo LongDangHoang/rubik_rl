@@ -355,26 +355,29 @@ class Rubik54:
         (2, 2, 2): FRONT_TOP_RIGHT_CORNER,
     }
 
+    TURN_IDX_TO_STR_SWAP_DICT = {
+        1: ("F", F),
+        2: ("R", R),
+        3: ("B", B),
+        4: ("L", L),
+        5: ("T", T),
+        6: ("D", D),
+        7: ("F_PRIME", F_PRIME),
+        8: ("R_PRIME", R_PRIME),
+        9: ("B_PRIME", B_PRIME),
+        10: ("L_PRIME", L_PRIME),
+        11: ("T_PRIME", T_PRIME),
+        12: ("D_PRIME", D_PRIME),
+    }
+
 
     def __init__(self):
         self.state = self.get_solved_state()
         self.turns = {
             turn_name: self.get_turn_state_idx(turn_swap_dict)
-            for turn_name, turn_swap_dict in [
-                ("F", self.F),
-                ("R", self.R),
-                ("B", self.B),
-                ("L", self.L),
-                ("T", self.T),
-                ("D", self.D),
-                ("F_PRIME", self.F_PRIME),
-                ("R_PRIME", self.R_PRIME),
-                ("B_PRIME", self.B_PRIME),
-                ("L_PRIME", self.L_PRIME),
-                ("T_PRIME", self.T_PRIME),
-                ("D_PRIME", self.D_PRIME),
-            ]
+            for turn_name, turn_swap_dict in self.TURN_IDX_TO_STR_SWAP_DICT.values()
         }
+        self.turn_mat = np.array([self.turns[self.TURN_IDX_TO_STR_SWAP_DICT[i][0]] for i in range(12)])
     
     def get_solved_state(self):
         """Return the state which we consider the cube is solve"""
