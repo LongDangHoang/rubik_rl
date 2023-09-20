@@ -428,3 +428,17 @@ class Rubik54:
         # Create a scene and add the cube pieces to it
         scene = p3.Scene(children=cube_pieces)
         return scene
+
+    def apply_turn_shorthands(self, state: np.ndarray, turn_shorthand: str):
+        moves = turn_shorthand.split(" ")
+        for m in moves:
+            m = m.replace("U", "T")
+            suffix = ""
+            if "'" in m:
+                suffix = "_PRIME"
+            move = m[0] + suffix
+            state = self.change_state_after_turn(state, move)
+            if m.endswith("2"):
+                state = self.change_state_after_turn(state, move)
+
+        return state
