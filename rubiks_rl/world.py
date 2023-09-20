@@ -14,6 +14,7 @@ CUBE = Rubik54()
 def get_n_cubes_k_scrambles(
     num_cubes: int, 
     max_depth_scramble: int,
+    seed: int=314,
 ) -> np.ndarray:
     """
     Return a (max_depth_scramble*num_cubes, 54, 6) tensor 
@@ -25,8 +26,9 @@ def get_n_cubes_k_scrambles(
     data = np.array([solved_state] * num_cubes)
     data_lst = []
 
+    generator = np.random.default_rng(seed=seed)
     for _ in range(max_depth_scramble):
-        move = np.random.randint(12, size=(num_cubes))
+        move = generator.integers(12, size=(num_cubes))
         turn_mat = CUBE.turn_mat[move]
         data_lst.append(
             np.take_along_axis(data, np.expand_dims(turn_mat, 2), axis=1)
