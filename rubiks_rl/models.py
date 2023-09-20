@@ -4,6 +4,7 @@ import torch.nn as nn
 
 class Block(nn.Module):
     def __init__(self):
+        super(Block, self).__init__()
         self.act = nn.ELU()
         self.fc1 = nn.Linear(54 * 6, 54 * 6)
         self.attn = nn.MultiheadAttention(embed_dim=54*6, num_heads=1, batch_first=True)
@@ -22,6 +23,7 @@ class Block(nn.Module):
 
 class RubikModel(nn.Module):
     def __init__(self, num_blocks: int):
+        super(RubikModel, self).__init__()
         self.flatten = nn.Flatten()
         self.blocks = nn.Sequential(*[
             Block()
