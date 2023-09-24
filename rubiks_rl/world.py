@@ -110,8 +110,12 @@ def model_evaluate(cube_state: np.ndarray, model: RubikModel, device: torch.Devi
     model.eval()
     values = []
     with torch.no_grad():
-        for batch in np.array_split(cube_state, batch_size):
-            batch = torch.as_tensor(batch, device=device, dtype=torch.float32)
+        for batch_idx in range(0, cube_state.shape[0], batch_size):
+            batch = torch.as_tensor(
+                cube_state[batch_idx:batch_idx+batch_size],
+                device=device,
+                dtype=torch.float32
+            )
             v, _ = model.forward(batch)
             values.extend(v.cpu().numpy()[:, 0])
     
