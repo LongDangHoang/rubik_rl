@@ -33,7 +33,10 @@ class RubikModel(nn.Module):
         ]) 
 
         self.value_head = nn.Linear(54 * 6, 1)
-        self.policy_head = nn.Linear(54 * 6, 12)
+        self.policy_head = nn.Sequential(
+            nn.Linear(54 * 6, 12),
+            nn.Softmax(),
+        )
 
     def forward(self, x) -> Tuple[torch.Tensor, torch.Tensor]:
         x = self.flatten(x)
