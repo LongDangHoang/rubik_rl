@@ -6,6 +6,7 @@ import numpy as np
 import torch.nn as nn
 
 from rubiks_rl.rubik54 import Rubik54
+from rubiks_rl.models import RubikModel
 
 from typing import Callable, Tuple
 
@@ -61,7 +62,7 @@ def get_depth_1_lookup_of_state(
     The k-th state's subsequent states are at positions 12 * k + range(12)
     """
     # repeat state to pad out 12 times and likewise with move
-    num_states = cube_state.size(0)
+    num_states = cube_state.shape[0]
     cube_state = np.repeat(cube_state, 12, axis=0)
     move = np.tile(np.arange(12), num_states)
     turn_mat = CUBE.turn_mat[move]
@@ -91,7 +92,9 @@ def find_best_move_and_value_from(
     cube_state_values = evaluate_fn(next_cube_state)
 
     # add in the reward
-    cube_state_values = cube_state_values - 1 + 2 * cube_state_values == CUBE.SOLVED_STATE
+    cube_state_values = cube_state_values - 1 + 2 * (
+        next_cube_state == np.expand_dims(CUBE.SOLVED_STATE, 0)
+    ).all(axis=(1, 2))
 
     # take maximum and action
     best_action = cube_state_values.reshape((-1, 12)).argmax(axis=1)
@@ -100,15 +103,16 @@ def find_best_move_and_value_from(
     return best_action, best_cube_state_values
 
 
-def model_evaluate(cube_state: np.ndarray, model: nn.Module, device: torch.DeviceObjType=None, batch_size: int=32) -> np.ndarray:
+def model_evaluate(cube_state: np.ndarray, model: RubikModel, device: torch.DeviceObjType=None, batch_size: int=32) -> np.ndarray:
     if device is None:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     model.eval()
     values = []
     with torch.no_grad():
-        for batch in cube_state[::batch_size]:
+        for batch in np.array_split(cube_state, batch_size):
             batch = torch.Tensor(batch, device=device)
-            values.extend(model(batch)[:, 0])
+            v, _ = model.forward(batch)
+            values.extend(v[:, 0])
     
     return np.array(values)

@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 
+from typing import Tuple
+
 
 class Block(nn.Module):
     def __init__(self):
@@ -33,7 +35,7 @@ class RubikModel(nn.Module):
         self.value_head = nn.Linear(54 * 6, 1)
         self.policy_head = nn.Linear(54 * 6, 12)
 
-    def forward(self, x):
+    def forward(self, x) -> Tuple[torch.Tensor, torch.Tensor]:
         x = self.flatten(x)
         x = self.blocks(x)
         v = self.value_head(x)
