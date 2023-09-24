@@ -35,7 +35,7 @@ class RubikModel(nn.Module):
         self.value_head = nn.Linear(54 * 6, 1)
         self.policy_head = nn.Sequential(
             nn.Linear(54 * 6, 12),
-            nn.Softmax(),
+            nn.Softmax(dim=1),
         )
 
     def forward(self, x) -> Tuple[torch.Tensor, torch.Tensor]:
