@@ -98,7 +98,7 @@ def find_best_move_and_value_from(
 
     # take maximum and action
     best_action = cube_state_values.reshape((-1, 12)).argmax(axis=1)
-    best_cube_state_values = cube_state_values[best_action]
+    best_cube_state_values = cube_state_values.reshape((-1, 12)).max(axis=1)
     
     return best_action, best_cube_state_values
 
