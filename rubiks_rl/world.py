@@ -91,16 +91,15 @@ def find_best_move_and_value_from(
     """
     # generate look ahead by 1
     next_cube_state = get_depth_1_lookup_of_state(cube_state)
-
-    # evaluate using a model
-    cube_state_values = evaluate_fn(next_cube_state)
-    assert len(cube_state_values.shape) == 1
-
-    # add in the reward
-    cube_state_values = cube_state_values - 1 + 2 * np.all(
+    is_next_cube_solved = np.all(
         next_cube_state == np.expand_dims(CUBE.SOLVED_STATE, 0),
         axis=(1, 2)
     )
+
+    # evaluate potential rewards using a model, unless we are in the solved state
+    cube_state_values = evaluate_fn(next_cube_state)
+    assert len(cube_state_values.shape) == 1
+    cube_state_values = np.where(is_next_cube_solved, 1, cube_state_values - 1)
 
     # take maximum and action
     best_action = cube_state_values.reshape((-1, 12)).argmax(axis=1)
