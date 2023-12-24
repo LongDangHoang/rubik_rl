@@ -6,7 +6,6 @@ import numpy as np
 import torch.nn as nn
 
 from rubiks_rl.rubik54 import Rubik54
-from rubiks_rl.models import RubikModel
 
 from typing import Callable, Dict, List, Literal, Tuple
 
@@ -110,7 +109,7 @@ def find_best_move_and_value_from(
     return best_action, best_cube_state_values
 
 
-def model_evaluate(cube_state: np.ndarray, model: RubikModel, device: torch.DeviceObjType=None, batch_size: int=32) -> np.ndarray:
+def model_evaluate(cube_state: np.ndarray, model: nn.Module, device: torch.DeviceObjType=None, batch_size: int=32) -> np.ndarray:
     if device is None:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
