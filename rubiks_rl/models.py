@@ -41,7 +41,7 @@ class LMRubikModel(nn.Module):
         ]) 
 
         self.next_move_head = nn.Sequential(
-            nn.Linear(d_model, 12),
+            nn.Linear(d_model, 13),
             nn.Softmax(dim=-1)
         )
 

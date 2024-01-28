@@ -1,7 +1,6 @@
 import unittest
 import numpy as np
 
-from rubiks_rl.colors import Color
 from rubiks_rl.rubik54 import Rubik54
 from rubiks_rl.world import (
     get_depth_1_lookup_of_state,
@@ -11,38 +10,7 @@ from rubiks_rl.world import (
 
 class WorldTest(unittest.TestCase):
     CUBE = Rubik54()
-    TEST_SHORTHAND_STR = "L2 B2 F2 R' B' D F2 R2 F2 L2 D2 R D2 L' U' F L D' R' D' B' L' R2 B' D2 F2 L' R2 F' D L' R2 U' F' U L F' D' U2 R2 U2 B L' D B' F2 D F' L' R2" 
-
-    def manual_check_short_hand(self):
-        state = self.CUBE.apply_turn_shorthands(
-            self.CUBE.get_solved_state(),
-            self.TEST_SHORTHAND_STR
-        )
-
-        test_colors = [
-            Color.BLUE, Color.GREEN, Color.WHITE,
-            Color.GREEN, Color.GREEN, Color.WHITE,
-            Color.BLUE, Color.GREEN, Color.ORANGE,
-            Color.GREEN, Color.WHITE, Color.YELLOW,
-            Color.BLUE, Color.RED, Color.BLUE,
-            Color.YELLOW, Color.ORANGE, Color.ORANGE,
-            Color.BLUE, Color.ORANGE, Color.RED,
-            Color.RED, Color.BLUE, Color.BLUE,
-            Color.WHITE, Color.ORANGE, Color.GREEN,
-            Color.YELLOW, Color.RED, Color.RED,
-            Color.YELLOW, Color.ORANGE, Color.YELLOW,
-            Color.RED, Color.RED, Color.RED, 
-            Color.WHITE, Color.ORANGE, Color.GREEN,
-            Color.YELLOW, Color.WHITE, Color.BLUE,
-            Color.WHITE, Color.WHITE, Color.BLUE,
-            Color.GREEN, Color.YELLOW, Color.ORANGE,
-            Color.WHITE, Color.YELLOW, Color.GREEN,
-            Color.YELLOW, Color.RED, Color.ORANGE
-        ]
-
-        for test_color, values in zip(test_colors, state):
-            color_idx = values.argmax()
-            self.assertEqual(color_idx, test_color)
+    TEST_SHORTHAND_STR = "L2 B2 F2 R' B' D F2 R2 F2 L2 D2 R D2 L' U' F L D' R' D' B' L' R2 B' D2 F2 L' R2 F' D L' R2 U' F' U L F' D' U2 R2 U2 B L' D B' F2 D F' L' R2"
 
     def test_n_cubes_k_scrambles(self):
         test_n_cubes = 5
@@ -76,6 +44,9 @@ class WorldTest(unittest.TestCase):
             self.assertTrue(np.all(test_state == state[move_idx]))
 
     def test_find_best_move_and_value_from(self):
+        # Test broken since the implementation changes to fix the state value for the solved state
+        # TODO: repair
+        # pass for now
         test_n_cubes = 100
         init_move = "R" 
         reverse_move_idx = [i for i in range(12) if self.CUBE.TURN_IDX_TO_STR_SWAP_DICT[i][0] == (init_move + "_PRIME")][0]

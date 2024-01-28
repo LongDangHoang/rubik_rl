@@ -370,6 +370,20 @@ class Rubik54:
         11: ("D_PRIME", D_PRIME),
     }
 
+    TURN_STR_TO_IDX = {
+        "F": 0,
+        "R": 1,
+        "B": 2,
+        "L": 3,
+        "T": 4,
+        "D": 5,
+        "F_PRIME": 6,
+        "R_PRIME": 7,
+        "B_PRIME": 8,
+        "L_PRIME": 9,
+        "T_PRIME": 10,
+        "D_PRIME": 11
+    }
 
     def __init__(self):
         self.state = self.get_solved_state()
@@ -442,3 +456,6 @@ class Rubik54:
                 state = self.change_state_after_turn(state, move)
 
         return state
+
+    def reverse_turn_idx(self, turn_idx: int) -> int:
+        return (turn_idx + 6) % 12
