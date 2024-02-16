@@ -4,12 +4,12 @@ import torch
 import torch.nn as nn
 import rubiks_rl.constants as constants
 
+from rubiks_rl.rubik54 import Rubik54
 from rubiks_rl.models import RLRubikModel, LMRubikModel
+from rubiks_rl.world import get_depth_1_lookup_of_state
 
 from timeit import default_timer as timer
 from dataclasses import dataclass
-from world import get_depth_1_lookup_of_state
-from rubik54 import Rubik54
 from typing import List, Optional, Callable
 
 @dataclass
@@ -34,9 +34,11 @@ class MCTSRubik54:
         cube_state: np.ndarray,
         exploration_coef: float=0.01,
         virtual_loss_coef: float=0.01,
+        verbose: bool=False,
     ) -> None:
         self.exploration_coef = exploration_coef
         self.virtual_loss_coef = virtual_loss_coef
+        self.verbose = verbose
         
         v, p = self.state_value_next_action_prob_function(np.expand_dims(cube_state, 0), [])
         self.root = Node(
@@ -54,6 +56,9 @@ class MCTSRubik54:
         chosen_actions: List[int] = []
         
         while not node.is_leaf:
+            if self.verbose:
+                print(f"========= At node ID {id(node)} ==========")
+
             exploration_term: np.ndarray = (
                 self.exploration_coef
                 * node.prior_probability 
@@ -71,6 +76,12 @@ class MCTSRubik54:
 
             node.virtual_loss[chosen_action] += self.virtual_loss_coef
             node = node.children[chosen_action]
+
+            if self.verbose:
+                print("Exploration terms:", exploration_term)
+                print("Exploitation terms:", exploitation_term)
+                print("Chosen action:", chosen_action)
+                print("")
 
         else:
             node.is_leaf = False
@@ -90,6 +101,12 @@ class MCTSRubik54:
                 )
         
             expanded_node = node
+
+            if self.verbose:
+                print(f"========= Expanding node ID {id(node)} ==========")
+                print("Prior values for children:", vs)
+                print("Prior probabilities for children:\n", ps)
+                print("")
 
         for node, action_idx in zip(visited_nodes, chosen_actions):
             node.count_times_explored[action_idx] += 1
