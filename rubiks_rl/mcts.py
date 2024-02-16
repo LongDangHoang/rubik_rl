@@ -2,11 +2,15 @@ import time
 import numpy as np
 import torch
 import torch.nn as nn
+import rubiks_rl.constants as constants
 
+from rubiks_rl.models import RLRubikModel, LMRubikModel
+
+from timeit import default_timer as timer
 from dataclasses import dataclass
 from world import get_depth_1_lookup_of_state
 from rubik54 import Rubik54
-from typing import List, Optional
+from typing import List, Optional, Callable
 
 @dataclass
 class Node:
@@ -14,6 +18,7 @@ class Node:
     maximal_value: np.ndarray
     virtual_loss: np.ndarray
     prior_probability: np.ndarray
+    prior_state_value: float
     cube_state: np.ndarray
 
     is_leaf: bool = True
@@ -22,33 +27,26 @@ class Node:
     
 class MCTSRubik54:
 
-    EXPLORATION_COEF = 0.01
-    VIRTUAL_LOSS_COEF = 0.01
     CUBE = Rubik54()
 
-    def __init__(self, cube_state: np.ndarray, model: nn.Module) -> None:
-        self.model = model
-        self.device = model.device
-
-        with torch.no_grad():
-            model.eval()
-            _, p = model(
-                torch.as_tensor(
-                    np.expand_dims(cube_state, 0),
-                    dtype=torch.float32,
-                    device=self.device
-                )
-            )
-            p = p.cpu().numpy()
-
+    def __init__(
+        self,
+        cube_state: np.ndarray,
+        exploration_coef: float=0.01,
+        virtual_loss_coef: float=0.01,
+    ) -> None:
+        self.exploration_coef = exploration_coef
+        self.virtual_loss_coef = virtual_loss_coef
+        
+        v, p = self.state_value_next_action_prob_function(np.expand_dims(cube_state, 0), [])
         self.root = Node(
             cube_state=cube_state,
-            prior_probability=p,
+            prior_probability=p[0],
+            prior_state_value=v[0],
             count_times_explored=np.zeros(12),
-            maximal_value=np.ones(12)*-np.inf,
+            maximal_value=np.zeros(12),
             virtual_loss=0,
         )
-
 
     def simulate_once(self):
         node = self.root
@@ -57,7 +55,7 @@ class MCTSRubik54:
         
         while not node.is_leaf:
             exploration_term: np.ndarray = (
-                self.EXPLORATION_COEF
+                self.exploration_coef
                 * node.prior_probability 
                 * np.sqrt(node.count_times_explored.sum())
                 * (1 + node.count_times_explored)
@@ -71,7 +69,7 @@ class MCTSRubik54:
             chosen_actions.append(chosen_action)
             visited_nodes.append(node)
 
-            node.virtual_loss[chosen_action] += self.VIRTUAL_LOSS_COEF
+            node.virtual_loss[chosen_action] += self.virtual_loss_coef
             node = node.children[chosen_action]
 
         else:
@@ -79,50 +77,32 @@ class MCTSRubik54:
             states = get_depth_1_lookup_of_state(
                 np.expand_dims(node.cube_state, 0)
             )
-            states = np.concatenate([
-                states,
-                np.expand_dims(node.cube_state, 0)
-            ], axis=0)
 
-            with torch.no_grad():
-                self.model.eval()
-                v, p = self.model(
-                    torch.as_tensor(
-                        states,
-                        dtype=torch.float32,
-                        device=self.device
-                    )
+            vs, ps = self.state_value_next_action_prob_function(states, chosen_actions)
+            for action_idx in range(12):
+                node.children[action_idx] = Node(
+                    cube_state=states[action_idx],
+                    prior_probability=ps[action_idx],
+                    prior_state_value=vs[action_idx],
+                    count_times_explored=np.zeros(12),
+                    maximal_value=np.zeros(12),
+                    virtual_loss=0,
                 )
-                p = p.cpu().numpy()
-                v = v.cpu().numpy()
-
-                for action_idx in range(12):
-                    node.children[action_idx] = Node(
-                        cube_state=states[action_idx],
-                        prior_probability=p[action_idx],
-                        count_times_explored=np.zeros(12),
-                        maximal_value=np.ones(12)*-np.inf,
-                        virtual_loss=0,
-                    )
-            
+        
             expanded_node = node
 
         for node, action_idx in zip(visited_nodes, chosen_actions):
             node.count_times_explored[action_idx] += 1
-            node.maximal_value[action_idx] = np.max(v[-1], node.maximal_value[action_idx])
-            node.virtual_loss[action_idx] -= self.VIRTUAL_LOSS_COEF
+            node.maximal_value[action_idx] = np.max(expanded_node.prior_state_value, node.maximal_value[action_idx])
+            node.virtual_loss[action_idx] -= self.virtual_loss_coef
 
         return expanded_node, chosen_actions
 
     def search(self, budget_time: int):
-        start = time.time()
-        if np.all(self.root.cube_state == self.CUBE.get_solved_state()):
-            raise ValueError("Cube already solved, terminating search")
-
         last_leaf_node = None
         last_path = None
-
-        while (time.time() - start < budget_time):
+        start = timer()
+        while (timer() - start < budget_time):
             if (last_leaf_node is not None) and np.all(
                 last_leaf_node.cube_state == self.CUBE.get_solved_state()
             ):
@@ -132,4 +112,61 @@ class MCTSRubik54:
 
         return self.root.maximal_value.argmax()
 
+    def get_tree_after_move(self, move_idx: int):
+        self.root = self.root.children[move_idx]
 
+    def state_value_next_action_prob_function(self, states: np.ndarray, actions: np.ndarray):
+        raise NotImplementedError
+
+
+class MCTSRL(MCTSRubik54):
+
+    def __init__(self, model: RLRubikModel, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.model = model
+
+    def state_value_next_action_prob_function(self, states: np.ndarray, chosen_actions: List[int]):
+        with torch.no_grad():
+            model_dtype = next(iter(self.model.parameters())).dtype
+            states = torch.as_tensor(states, dtype=model_dtype, device=self.model.device)
+            v, p = self.model(states)
+            return v.cpu().numpy(), p.cpu().numpy()
+
+
+class MCTSLM(MCTSRubik54):
+    def __init__(self, model: LMRubikModel, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.model = model
+
+    def state_value_next_action_prob_function(self, states: np.ndarray, chosen_actions: List[int]):
+        assert len(states) == 12 # making predictions for a 1 look up ahead
+        with torch.no_grad():
+            tokens = np.concatenate([
+                np.tile(
+                    self.root.cube_state.argmax(axis=1) + 1,
+                    (12, 1)
+                ),
+                np.tile(
+                    np.array(chosen_actions) + 7,
+                    (12, 1)
+                ),
+                np.expand_dims(np.arange(12) + 7, 1),
+                np.ones((
+                    12, 
+                    constants.MAX_SEQUENCE_LENGTH
+                    - len(chosen_actions) # actions so far
+                    - 54                  # cube states
+                    - 1                   # action used to generate the states
+                )) * constants.PADDING_IDX
+            ], axis=1)
+            assert tokens.shape == (12, 200)
+
+            tokens = torch.as_tensor(tokens, dtype=torch.long).to(self.model.device)
+            mask = torch.triu(torch.ones(constants.MAX_SEQUENCE_LENGTH, constants.MAX_SEQUENCE_LENGTH))
+            mask[:54, :54] = 0
+            mask = mask.to(self.model.device)
+
+            p = self.model(states)[:, 53 + len(chosen_actions) + 1, :]
+            vs = p[:, 12]
+            ps = p[:, :12] / p.sum(axis=1)
+            return vs.cpu().numpy(), ps.cpu().numpy()
