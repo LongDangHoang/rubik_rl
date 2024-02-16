@@ -40,7 +40,10 @@ class MCTSRubik54:
         self.virtual_loss_coef = virtual_loss_coef
         self.verbose = verbose
         
-        v, p = self.state_value_next_action_prob_function(np.expand_dims(cube_state, 0), [])
+        v, p = self.state_value_next_action_prob_function(
+            np.expand_dims(cube_state, 0), 
+            np.array([]).reshape((1, 0))
+        )
         self.root = Node(
             cube_state=cube_state,
             prior_probability=p[0],
@@ -88,8 +91,12 @@ class MCTSRubik54:
             states = get_depth_1_lookup_of_state(
                 np.expand_dims(node.cube_state, 0)
             )
+            actions = np.concatenate([
+                np.tile(np.array(chosen_actions), (12, 1)),
+                np.expand_dims(np.arange(12), 1)
+            ], axis=1)
 
-            vs, ps = self.state_value_next_action_prob_function(states, chosen_actions)
+            vs, ps = self.state_value_next_action_prob_function(states, actions)
             for action_idx in range(12):
                 node.children[action_idx] = Node(
                     cube_state=states[action_idx],
@@ -142,7 +149,7 @@ class MCTSRL(MCTSRubik54):
         super().__init__(*args, **kwargs)
         self.model = model
 
-    def state_value_next_action_prob_function(self, states: np.ndarray, chosen_actions: List[int]):
+    def state_value_next_action_prob_function(self, states: np.ndarray, chosen_actions: np.ndarray):
         with torch.no_grad():
             model_dtype = next(iter(self.model.parameters())).dtype
             states = torch.as_tensor(states, dtype=model_dtype, device=self.model.device)
@@ -155,35 +162,27 @@ class MCTSLM(MCTSRubik54):
         super().__init__(*args, **kwargs)
         self.model = model
 
-    def state_value_next_action_prob_function(self, states: np.ndarray, chosen_actions: List[int]):
-        assert len(states) == 12 # making predictions for a 1 look up ahead
+    def state_value_next_action_prob_function(self, states: np.ndarray, chosen_actions: np.ndarray):
+        assert chosen_actions.shape[0] == states.shape[0]
         with torch.no_grad():
             tokens = np.concatenate([
-                np.tile(
-                    self.root.cube_state.argmax(axis=1) + 1,
-                    (12, 1)
-                ),
-                np.tile(
-                    np.array(chosen_actions) + 7,
-                    (12, 1)
-                ),
-                np.expand_dims(np.arange(12) + 7, 1),
+                self.root.cube_state.argmax(axis=1) + 1,
+                chosen_actions + 7,
                 np.ones((
-                    12, 
+                    chosen_actions.shape[0], 
                     constants.MAX_SEQUENCE_LENGTH
-                    - len(chosen_actions) # actions so far
-                    - 54                  # cube states
-                    - 1                   # action used to generate the states
+                    - chosen_actions.shape[1]       # actions so far
+                    - 54                            # cube states
                 )) * constants.PADDING_IDX
             ], axis=1)
-            assert tokens.shape == (12, 200)
+            assert len(tokens.shape) == 2 and tokens.shape[1] == constants.MAX_SEQUENCE_LENGTH and tokens.shape[0] == chosen_actions.shape[0]
 
             tokens = torch.as_tensor(tokens, dtype=torch.long).to(self.model.device)
             mask = torch.triu(torch.ones(constants.MAX_SEQUENCE_LENGTH, constants.MAX_SEQUENCE_LENGTH))
             mask[:54, :54] = 0
             mask = mask.to(self.model.device)
 
-            p = self.model(states)[:, 53 + len(chosen_actions) + 1, :]
+            p = self.model(states)[:, 53 + chosen_actions.shape[1], :]
             vs = p[:, 12]
             ps = p[:, :12] / p.sum(axis=1)
             return vs.cpu().numpy(), ps.cpu().numpy()
