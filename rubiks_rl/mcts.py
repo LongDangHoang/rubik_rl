@@ -144,10 +144,9 @@ class MCTSRubik54:
 
 
 class MCTSRL(MCTSRubik54):
-
     def __init__(self, model: RLRubikModel, *args, **kwargs):
-        super().__init__(*args, **kwargs)
         self.model = model
+        super().__init__(*args, **kwargs)
 
     def state_value_next_action_prob_function(self, states: np.ndarray, chosen_actions: np.ndarray):
         with torch.no_grad():
@@ -159,14 +158,18 @@ class MCTSRL(MCTSRubik54):
 
 class MCTSLM(MCTSRubik54):
     def __init__(self, model: LMRubikModel, *args, **kwargs):
-        super().__init__(*args, **kwargs)
         self.model = model
+        super().__init__(*args, **kwargs)
 
     def state_value_next_action_prob_function(self, states: np.ndarray, chosen_actions: np.ndarray):
         assert chosen_actions.shape[0] == states.shape[0]
         with torch.no_grad():
             tokens = np.concatenate([
-                self.root.cube_state.argmax(axis=1) + 1,
+                (
+                    self.root.cube_state
+                    if chosen_actions.shape[1] > 0
+                    else states
+                ).argmax(axis=1) + 1,
                 chosen_actions + 7,
                 np.ones((
                     chosen_actions.shape[0], 
